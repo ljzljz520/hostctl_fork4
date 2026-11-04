@@ -6,7 +6,6 @@ import (
 	"github.com/guumaster/cligger"
 	"github.com/spf13/cobra"
 
-	"github.com/guumaster/hostctl/pkg/file"
 	"github.com/guumaster/hostctl/pkg/types"
 )
 
@@ -20,13 +19,12 @@ Set content in your hosts file.
 If the profile already exists it will be added to it.`,
 		Args: commonCheckProfileOnly,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			src, _ := cmd.Flags().GetString("host-file")
 			ip, _ := cmd.Flags().GetString("ip")
 			quiet, _ := cmd.Flags().GetBool("quiet")
 			name := args[0]
 			hostnames := args[1:]
 
-			h, err := file.NewFile(src)
+			h, err := openHostFile(cmd)
 			if err != nil {
 				return err
 			}

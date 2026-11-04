@@ -2,8 +2,6 @@ package actions
 
 import (
 	"github.com/spf13/cobra"
-
-	"github.com/guumaster/hostctl/pkg/file"
 )
 
 func newToggleCmd() *cobra.Command {
@@ -15,9 +13,7 @@ Alternates between on/off status of an existing profile.
 `,
 		Args: commonCheckProfileOnly,
 		RunE: func(cmd *cobra.Command, profiles []string) error {
-			src, _ := cmd.Flags().GetString("host-file")
-
-			h, err := file.NewFile(src)
+			h, err := openHostFile(cmd)
 			if err != nil {
 				return err
 			}

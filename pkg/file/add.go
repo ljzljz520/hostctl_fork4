@@ -10,7 +10,9 @@ func (f *File) AddProfile(p *types.Profile) error {
 		return types.ErrDefaultProfile
 	}
 
-	f.MergeProfiles([]*types.Profile{p})
+	return f.applyStrict(func() error {
+		f.MergeProfiles([]*types.Profile{p})
 
-	return nil
+		return nil
+	})
 }

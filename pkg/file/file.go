@@ -19,6 +19,7 @@ type File struct {
 	src       afero.File
 	data      *types.Content
 	hasBanner bool
+	strict    bool
 	mutex     sync.Mutex
 }
 
@@ -129,12 +130,15 @@ func (f *File) AddRoutes(name string, routes []*types.Route) error {
 
 		p.AddRoutes(routes)
 
+		// AddProfile performs the strict check on the final profile set.
 		return f.AddProfile(p)
 	}
 
-	p.AddRoutes(routes)
+	return f.applyStrict(func() error {
+		p.AddRoutes(routes)
 
-	return nil
+		return nil
+	})
 }
 
 // RemoveHostnames removes route information from a given types.
@@ -161,6 +165,11 @@ func (f *File) RemoveHostnames(name string, routes []string) (bool, error) {
 
 // WriteTo overwrite file with hosts info.
 func (f *File) WriteTo(src string) error {
+	// Never touch the destination file when the strict check fails.
+	if err := f.checkStrict(); err != nil {
+		return err
+	}
+
 	h, err := f.fs.OpenFile(src, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644) //nolint: gomnd
 	if err != nil {
 		return err
@@ -171,6 +180,11 @@ func (f *File) WriteTo(src string) error {
 
 // Flush overwrite file with hosts info.
 func (f *File) Flush() error {
+	// Never touch the hosts file when the strict check fails.
+	if err := f.checkStrict(); err != nil {
+		return err
+	}
+
 	h, err := f.fs.OpenFile(f.src.Name(), os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0644) //nolint: gomnd
 	if err != nil {
 		return err

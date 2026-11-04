@@ -62,11 +62,10 @@ It will be listed as "off" while it is disabled.
 
 func makeEnableDisable(actionFn enableDisableFn) func(cmd *cobra.Command, profiles []string) error {
 	return func(cmd *cobra.Command, profiles []string) error {
-		src, _ := cmd.Flags().GetString("host-file")
 		only, _ := cmd.Flags().GetBool("only")
 		all, _ := cmd.Flags().GetBool("all")
 
-		h, err := file.NewFile(src)
+		h, err := openHostFile(cmd)
 		if err != nil {
 			return err
 		}

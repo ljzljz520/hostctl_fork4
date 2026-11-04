@@ -11,6 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/guumaster/hostctl/pkg/file"
 	"github.com/guumaster/hostctl/pkg/render"
 	"github.com/guumaster/hostctl/pkg/types"
 )
@@ -78,6 +79,23 @@ func containsDefault(args []string) error {
 	}
 
 	return nil
+}
+
+// openHostFile loads the hosts file targeted by the command and applies the
+// shared flags (such as --strict) so every mutating entry point validates
+// the final profile set the same way.
+func openHostFile(cmd *cobra.Command) (*file.File, error) {
+	src, _ := cmd.Flags().GetString("host-file")
+
+	h, err := file.NewFile(src)
+	if err != nil {
+		return nil, err
+	}
+
+	strict, _ := cmd.Flags().GetBool("strict")
+	h.SetStrict(strict)
+
+	return h, nil
 }
 
 func getDefaultHostFile() string {

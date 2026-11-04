@@ -10,7 +10,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/guumaster/hostctl/pkg/docker"
-	"github.com/guumaster/hostctl/pkg/file"
 	"github.com/guumaster/hostctl/pkg/parser"
 	"github.com/guumaster/hostctl/pkg/types"
 )
@@ -43,7 +42,6 @@ Reads from a docker-compose.yml file  the list of containers and add names and I
 		},
 		Args: commonCheckArgs,
 		RunE: func(cmd *cobra.Command, profiles []string) error {
-			src, _ := cmd.Flags().GetString("host-file")
 			name := profiles[0]
 
 			opts, err := getOptionsFn(cmd, profiles)
@@ -56,7 +54,7 @@ Reads from a docker-compose.yml file  the list of containers and add names and I
 				return err
 			}
 
-			h, err := file.NewFile(src)
+			h, err := openHostFile(cmd)
 			if err != nil {
 				return err
 			}

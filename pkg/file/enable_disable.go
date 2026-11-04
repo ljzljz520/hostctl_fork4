@@ -39,19 +39,21 @@ func (f *File) EnableOnly(profiles []string) error {
 }
 
 func (f *File) changeToSplitted(profiles []string, status types.Status) error {
-	for _, name := range f.data.ProfileNames {
-		p := f.data.Profiles[name]
+	return f.applyStrict(func() error {
+		for _, name := range f.data.ProfileNames {
+			p := f.data.Profiles[name]
 
-		if contains(profiles, name) {
-			p.Status = status
-		} else {
-			p.Status = invertStatus(status)
+			if contains(profiles, name) {
+				p.Status = status
+			} else {
+				p.Status = invertStatus(status)
+			}
+
+			f.data.Profiles[name] = p
 		}
 
-		f.data.Profiles[name] = p
-	}
-
-	return nil
+		return nil
+	})
 }
 
 func invertStatus(s types.Status) types.Status {
@@ -63,19 +65,21 @@ func invertStatus(s types.Status) types.Status {
 }
 
 func (f *File) changeTo(profiles []string, status types.Status) error {
-	for _, name := range profiles {
-		if name == types.Default {
-			continue
+	return f.applyStrict(func() error {
+		for _, name := range profiles {
+			if name == types.Default {
+				continue
+			}
+
+			p, ok := f.data.Profiles[name]
+			if !ok {
+				return types.ErrUnknownProfile
+			}
+
+			p.Status = status
+			f.data.Profiles[name] = p
 		}
 
-		p, ok := f.data.Profiles[name]
-		if !ok {
-			return types.ErrUnknownProfile
-		}
-
-		p.Status = status
-		f.data.Profiles[name] = p
-	}
-
-	return nil
+		return nil
+	})
 }

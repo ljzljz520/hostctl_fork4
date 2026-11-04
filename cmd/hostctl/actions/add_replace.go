@@ -57,7 +57,6 @@ If the profile already exists it will be overwritten.
 
 func makeAddReplace(actionFn addRemoveFn) func(cmd *cobra.Command, profiles []string) error {
 	return func(cmd *cobra.Command, profiles []string) error {
-		src, _ := cmd.Flags().GetString("host-file")
 		from, _ := cmd.Flags().GetString("from")
 		in := cmd.InOrStdin()
 
@@ -66,7 +65,7 @@ func makeAddReplace(actionFn addRemoveFn) func(cmd *cobra.Command, profiles []st
 			return err
 		}
 
-		h, err := file.NewFile(src)
+		h, err := openHostFile(cmd)
 		if err != nil {
 			return err
 		}

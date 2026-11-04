@@ -57,6 +57,7 @@ you need each time with a simple interface.
 	rootCmd.PersistentFlags().StringSliceP("column", "c", nil, "Column names to show on lists. comma separated")
 
 	rootCmd.PersistentFlags().Bool("no-color", false, "force colorless output")
+	rootCmd.PersistentFlags().Bool("strict", false, "fail when enabled profiles map a domain to different IPs in the same address family")
 
 	registerCommands(rootCmd)
 
